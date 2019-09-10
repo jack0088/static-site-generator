@@ -4,6 +4,18 @@ local fs = {} -- namespace for unix low-level plumbing method wrappers
 
 
 --[[
+    @check (string) OS to check against; returns (boolean) true on match
+    platform regex for @check could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
+    returns (string) operating system identifier
+--]]
+function fs.platform(check)
+    local plat = uname("-s").__input
+    if type(check) == "string" then return type(string.match(string.lower(plat), "^"..string.lower(check))) ~= nil end
+    return plat
+end
+
+
+--[[
     @path (string) relative- or absolute path to a file or folder
     returns (boolean)
 --]]
@@ -91,18 +103,15 @@ function fs.permissions(path, right)
         -- which means User group automatically gets full rights (7 bits instead of 0)
         return chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
     end
-    -- TODO not sure about Linux support, maybe need to check platform and use `stat -c '%a' '<path>'`
-    return string.format(fmt, stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input)
+    if fs.platform("darwin") then -- MacOS
+        return string.format(fmt, stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input)
+    elseif fs.platform("linux") then -- Linux
+        return stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
+    elseif fs.platform("windows") then -- Windows
+        -- TODO?
+    end
+    return nil -- answer for unknown OS
 end
-
-
-
-
-print(fs.makefile("blah.txt"))
-print(fs.permissions("blah.txt", 44))
-print(fs.permissions("blah.txt"))
-
-
 
 
 return fs
