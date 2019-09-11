@@ -1,5 +1,4 @@
-require "ssg.sh" -- every os.execute command becomes accessible as global function call
-
+local sh = require "ssg.sh" -- every os.execute command becomes accessible as global function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
 
@@ -18,7 +17,7 @@ end
 -- platform regex for @check could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
 -- returns (string) operating system identifier
 function fs.platform(check)
-    local plat = fs.trim(uname("-s").__input)
+    local plat = fs.trim(sh.uname("-s").__input)
     if type(check) == "string" then return type(string.match(string.lower(plat), "^"..string.lower(check))) ~= nil end
     return plat
 end
@@ -27,21 +26,21 @@ end
 -- @path (string) relative- or absolute path to a file or folder
 -- returns (boolean)
 function fs.exists(path)
-    return test("-e", "'"..path.."'").__exitcode == 0
+    return sh.test("-e", "'"..path.."'").__exitcode == 0
 end
 
 
 -- @path (string) relative- or absolute path to a file
 -- returns (boolean)
 function fs.isfile(path)
-    return test("-f", "'"..path.."'").__exitcode == 0
+    return sh.test("-f", "'"..path.."'").__exitcode == 0
 end
 
 
 -- @path (string) relative- or absolute path to a folder
 -- returns (boolean)
 function fs.isfolder(path)
-    return test("-d", "'"..path.."'").__exitcode == 0
+    return sh.test("-d", "'"..path.."'").__exitcode == 0
 end
 
 
@@ -50,7 +49,7 @@ end
 -- returns (boolean) true on success
 function fs.makefile(path)
     if fs.isfolder(path) then return false end
-    return touch("'"..path.."'").__exitcode == 0
+    return sh.touch("'"..path.."'").__exitcode == 0
 end
 
 
@@ -60,7 +59,7 @@ end
 -- returns (boolean) true on success
 function fs.makefolder(path)
     if fs.isfile(path) then return false end
-    return mkdir("-p", "'"..path.."'").__exitcode == 0
+    return sh.mkdir("-p", "'"..path.."'").__exitcode == 0
 end
 
 
@@ -68,7 +67,7 @@ end
 -- skips non-existing file as well
 -- returns (boolean) true on success
 function fs.deletefile(path)
-    return rm("-f", "'"..path.."'").__exitcode == 0
+    return sh.rm("-f", "'"..path.."'").__exitcode == 0
 end
 
 
@@ -77,21 +76,21 @@ end
 -- skips non-existing folder
 -- returns (boolean) true on success
 function fs.deletefolder(path)
-    return rm("-rf", "'"..path.."'").__exitcode == 0
+    return sh.rm("-rf", "'"..path.."'").__exitcode == 0
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
-    return fs.trim(stat("-f", "%B", "'"..path.."'").__input) -- TODO check on other platforms than MacOS
+    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO check on other platforms than MacOS
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.modifiedat(path)
-    return fs.trim(date("-r", "'"..path.."'", "+%s").__input)
+    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input)
 end
 
 
@@ -108,17 +107,21 @@ function fs.permissions(path, right)
         -- because the User (who created the file) at least holds a read access
         -- thus trying to set rights to e.g. 044 would result in 644
         -- which means User group automatically gets full rights (7 bits instead of 0)
-        return chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
+        return sh.chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
     end
     if fs.platform("darwin") then -- MacOS
-        return string.format(fmt, fs.trim(stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input))
+        return string.format(fmt, fs.trim(sh.stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input))
     elseif fs.platform("linux") then -- Linux
-        return stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
+        return sh.stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
     elseif fs.platform("windows") then -- Windows
         -- TODO?
     end
     return nil -- answer for unknown OS
 end
+
+
+print(fs.permissions("ssg"))
+
 
 
 return fs

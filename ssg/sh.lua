@@ -1,4 +1,8 @@
-local M = {} -- found on https://github.com/zserge/luash
+-- found on https://github.com/zserge/luash
+-- modified 2019 by kontakt@herrsch.de
+
+local Shell = {}
+
 
 -- converts key and it's argument to "-k" or "-k=v" or just ""
 local function arg(k, a)
@@ -8,6 +12,7 @@ local function arg(k, a)
 	if type(a) == 'boolean' and a == true then return k end
 	error('invalid argument type', type(a), a)
 end
+
 
 -- converts nested tables into a flat list of arguments and concatenated input
 local function flatten(t)
@@ -39,6 +44,7 @@ local function flatten(t)
 	return result
 end
 
+
 -- returns a function that executes the command with given args and returns its
 -- output, exit status etc
 local function command(cmd, ...)
@@ -54,15 +60,15 @@ local function command(cmd, ...)
 		end
 
 		if args.input then
-			local f = io.open(M.tmpfile, 'w')
+			local f = io.open(Shell.tmpfile, 'w')
 			f:write(args.input)
 			f:close()
-			s = s .. ' <'..M.tmpfile
+			s = s .. ' <'..Shell.tmpfile
 		end
 		local p = io.popen(s, 'r')
 		local output = p:read('*a')
 		local _, exit, status = p:close()
-		os.remove(M.tmpfile)
+		os.remove(Shell.tmpfile)
 
 		local t = {
 			__input = output,
@@ -71,7 +77,7 @@ local function command(cmd, ...)
 		}
 		local mt = {
 			__index = function(self, k, ...)
-				return _G[k] --, ...
+                return Shell[k] --, ...
 			end,
 			__tostring = function(self)
 				-- return trimmed command output as a string
@@ -82,29 +88,13 @@ local function command(cmd, ...)
 	end
 end
 
--- TODO rewrite to avoid poluting global namespace
 
--- get global metatable
-local mt = getmetatable(_G)
-if mt == nil then
-  mt = {}
-  setmetatable(_G, mt)
-end
+Shell.command = command
+Shell.tmpfile = './shlua' --'/tmp/shluainput'
 
--- set hook for undefined variables
-mt.__index = function(t, cmd)
-	return command(cmd)
-end
 
--- export command() function and configurable temporary "input" file
-M.command = command
-M.tmpfile = '/tmp/shluainput'
-
--- allow to call sh to run shell commands
-setmetatable(M, {
-	__call = function(_, cmd, ...)
-		return command(cmd, ...)
-	end
+-- Shell(cmd, ...) and Shell.cmd(...) are equal calls
+return setmetatable(Shell, {
+    __index = function(_, cmd, ...) return command(cmd, ...) end;
+	__call = function(_, cmd, ...) return command(cmd, ...) end
 })
-
-return M
