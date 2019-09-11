@@ -18,7 +18,7 @@ end
 -- returns (string) operating system identifier
 function fs.platform(check)
     local plat = fs.trim(sh.uname("-s").__input)
-    if type(check) == "string" then return type(string.match(string.lower(plat), "^"..string.lower(check))) ~= nil end
+    if type(check) == "string" then return type(plat:lower():match("^"..check:lower())) ~= "nil" end
     return plat
 end
 
@@ -47,14 +47,14 @@ end
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
-    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO check on other platforms than MacOS
+    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO need to verify on other platforms than MacOS
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.modifiedat(path)
-    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input)
+    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input) -- TODO need to verify on other platforms than MacOS
 end
 
 
