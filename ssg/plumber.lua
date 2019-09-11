@@ -2,7 +2,7 @@
 -- that otherwise is only accessible through external libraries
 -- 2019 (c) kontakt@herrsch.de
 
-local sh = require "ssg.sh" -- every os.execute command becomes accessible as global function call
+local sh = require "ssg.shell" -- every os.execute command becomes accessible as global function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
 
