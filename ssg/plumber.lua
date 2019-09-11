@@ -44,6 +44,20 @@ function fs.isfolder(path)
 end
 
 
+-- @path (string) relative- or absolute path to the file or (sub-)folder
+-- returns (string) epoch/ unix date timestamp
+function fs.createdat(path)
+    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO check on other platforms than MacOS
+end
+
+
+-- @path (string) relative- or absolute path to the file or (sub-)folder
+-- returns (string) epoch/ unix date timestamp
+function fs.modifiedat(path)
+    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input)
+end
+
+
 -- @path (string) relative- or absolute path to the new, empty file
 -- does not override existing file but updates its timestamp
 -- returns (boolean) true on success
@@ -80,20 +94,6 @@ function fs.deletefolder(path)
 end
 
 
--- @path (string) relative- or absolute path to the file or (sub-)folder
--- returns (string) epoch/ unix date timestamp
-function fs.createdat(path)
-    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO check on other platforms than MacOS
-end
-
-
--- @path (string) relative- or absolute path to the file or (sub-)folder
--- returns (string) epoch/ unix date timestamp
-function fs.modifiedat(path)
-    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input)
-end
-
-
 -- @path (string) relative- or absolute path to folder or file
 -- @rights (string or number) permission level, see http://permissions-calculator.org
 -- fs.permissions(path) returns (string) an encoded 4 octal digit representing the permission level
@@ -118,10 +118,6 @@ function fs.permissions(path, right)
     end
     return nil -- answer for unknown OS
 end
-
-
-print(fs.permissions("ssg"))
-
 
 
 return fs
