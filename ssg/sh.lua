@@ -1,3 +1,4 @@
+-- Run Shell scripts with Lua syntax
 -- found on https://github.com/zserge/luash
 -- modified 2019 by kontakt@herrsch.de
 
