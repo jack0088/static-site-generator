@@ -13,12 +13,12 @@ function fs.trim(str)
 end
 
 
--- @check (string) OS to check against; returns (boolean) true on match
--- platform regex for @check could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
+-- @platform (string) operating system to check against; returns (boolean) true on match
+-- platform regex could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
 -- returns (string) operating system identifier
-function fs.platform(check)
+function fs.os(platform)
     local plat = fs.trim(sh.uname("-s").__input)
-    if type(check) == "string" then return type(plat:lower():match("^"..check:lower())) ~= "nil" end
+    if type(platform) == "string" then return type(plat:lower():match("^"..platform:lower())) ~= "nil" end
     return plat
 end
 
@@ -109,11 +109,11 @@ function fs.permissions(path, right)
         -- which means User group automatically gets full rights (7 bits instead of 0)
         return sh.chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
     end
-    if fs.platform("darwin") then -- MacOS
+    if fs.os("darwin") then -- MacOS
         return string.format(fmt, fs.trim(sh.stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input))
-    elseif fs.platform("linux") then -- Linux
+    elseif fs.os("linux") then -- Linux
         return sh.stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
-    elseif fs.platform("windows") then -- Windows
+    elseif fs.os("windows") then -- Windows
         -- TODO?
     end
     return nil -- answer for unknown OS
