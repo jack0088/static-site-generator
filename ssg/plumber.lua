@@ -35,6 +35,16 @@ function fs.exists(path)
 end
 
 
+-- @path (string) relative- or absolute path to a file or folder
+-- returns (string) mime-type of the resource
+function fs.mime(path)
+    -- NOTE for more predictable web-compilant results use the mime.lua module!
+    return fs.trim(tostring(sh.file("--mime-type", "-b", "'"..path.."'")))
+end
+
+print(fs.mime("content"))
+
+
 -- @path (string) relative- or absolute path to a file
 -- returns (boolean)
 function fs.isfile(path)
