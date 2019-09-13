@@ -1,5 +1,6 @@
--- Run Shell scripts to access systems low-level functionality
--- that otherwise is only accessible through external libraries
+-- Run Shell scripts to access systems in-build low-level functionality
+-- that otherwise would be accessible through external dependencies exclusevly;
+-- This library is primarily used to access the filesystem and OS statistics by its own internal tools
 -- 2019 (c) kontakt@herrsch.de
 
 local sh = require "ssg.shell" -- every os.execute command becomes accessible as global function call
