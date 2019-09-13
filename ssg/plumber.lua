@@ -42,8 +42,6 @@ function fs.mime(path)
     return fs.trim(tostring(sh.file("--mime-type", "-b", "'"..path.."'")))
 end
 
-print(fs.mime("content"))
-
 
 -- @path (string) relative- or absolute path to a file
 -- returns (boolean)
