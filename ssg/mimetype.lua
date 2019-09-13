@@ -310,7 +310,7 @@ function mimetypes.guess(path, db)
     if db.filenames[filename] then
         return db.filenames[name], directory, filename, extension
     end
-    if ext then
+    if extension then
         return db.extensions[extension], directory, filename, extension
     end
     return nil

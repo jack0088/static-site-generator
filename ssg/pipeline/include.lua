@@ -1,3 +1,6 @@
+-- This module is responsible for searching for any resource and loading it
+-- 2019 (c) kontakt@herrsch.de
+
 local mime = require "ssg.mime"
 local b64 = require "ssg.base64"
 local md = require "ssg.markdown"
@@ -22,7 +25,8 @@ function image64(path)
     }
 end
 
---print("<img src=\""..image64("content/test4.jpg").src.."\">")
+print(mime.guess("content/test.jpg"))
+-- print("<img src=\""..image64("content/test4.jpg").src.."\">")
 
 
 
@@ -35,4 +39,4 @@ function markdownhtml(path)
 end
 
 
-print(markdownhtml("content/description.md"))
+-- print(markdownhtml("content/description.md"))
