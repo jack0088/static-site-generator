@@ -48,16 +48,19 @@ function fs.isfolder(path)
 end
 
 
--- @resource (string) relative- or absolute path to the file or (sub-)folder to check existance against
--- returns (boolen or table) true on match; or an array of files of that folder
+-- @path (string) relative- or absolute path to the (sub-)folder
+-- @filter (string) filename to check against; or regex expression mask, see https://www.cyberciti.biz/faq/grep-regular-expressions
+-- returns (boolen or table) nil if @path leads to a file instead of a folder;
+-- true on a match with @filter + an array of files that match the @filter criteria;
+-- otherwise an array of files inside that folder
 function fs.infolder(path, filter)
     if not fs.isfolder(path) then return nil end
     local content = fs.trim(tostring(sh.ls("'"..path.."'"):grep("'"..(filter or "").."'")))
-    if filter then return content ~= "" end
     local list = {}
     for resource in content:gmatch("[^\r\n]*") do
         table.insert(list, resource)
     end
+    if filter then return content ~= "", list end
     return list
 end
 
