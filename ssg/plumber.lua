@@ -21,7 +21,7 @@ end
 -- platform regex could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
 -- returns (string) operating system identifier
 function fs.os(platform)
-    local plat = fs.trim(sh.uname("-s").__input)
+    local plat = fs.trim(tostring(sh.uname("-s")))
     if type(platform) == "string" then return type(plat:lower():match("^"..platform:lower())) ~= "nil" end
     return plat
 end
@@ -52,7 +52,7 @@ end
 -- returns (boolen or table) true on match; or an array of files of that folder
 function fs.infolder(path, filter)
     if not fs.isfolder(path) then return nil end
-    local content = fs.trim(sh.ls("'"..path.."'"):grep("'"..(filter or "").."'").__input)
+    local content = fs.trim(tostring(sh.ls("'"..path.."'"):grep("'"..(filter or "").."'")))
     if filter then return content ~= "" end
     local list = {}
     for resource in content:gmatch("[^\r\n]*") do
@@ -65,14 +65,14 @@ end
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
-    return fs.trim(sh.stat("-f", "%B", "'"..path.."'").__input) -- TODO need to verify on other platforms than MacOS
+    return fs.trim(tostring(sh.stat("-f", "%B", "'"..path.."'"))) -- TODO need to verify on other platforms than MacOS
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.modifiedat(path)
-    return fs.trim(sh.date("-r", "'"..path.."'", "+%s").__input) -- TODO need to verify on other platforms than MacOS
+    return fs.trim(tostring(sh.date("-r", "'"..path.."'", "+%s"))) -- TODO need to verify on other platforms than MacOS
 end
 
 
@@ -128,7 +128,7 @@ function fs.permissions(path, right)
         return sh.chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
     end
     if fs.os("darwin") then -- MacOS
-        return string.format(fmt, fs.trim(sh.stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4").__input))
+        return string.format(fmt, fs.trim(tostring(sh.stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4"))))
     elseif fs.os("linux") then -- Linux
         return sh.stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
     elseif fs.os("windows") then -- Windows
