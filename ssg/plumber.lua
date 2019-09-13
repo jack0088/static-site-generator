@@ -48,6 +48,22 @@ function fs.isfolder(path)
 end
 
 
+-- @resource (string) relative- or absolute path to the file or (sub-)folder to check existance against
+-- returns (boolen or table) true on match; or an array of files of that folder
+function fs.infolder(path, filter)
+    if not fs.isfolder(path) then return nil end
+    local content = fs.trim(sh.ls("'"..path.."'"):grep("'"..(filter or "").."'").__input)
+    if filter then return content ~= "" end
+    local list = {}
+    for resource in content:gmatch("[^\r\n]*") do
+        table.insert(list, resource)
+    end
+    return list
+end
+
+print(#fs.infolder("ssg/pipeline"))
+
+
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
