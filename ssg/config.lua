@@ -1,4 +1,7 @@
 return {
     input = "content",
-    output = "html"
+    output = "html",
+    temporary = "cache"
 }
+
+-- {content.foobar | plain}
