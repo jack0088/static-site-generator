@@ -61,8 +61,6 @@ function fs.infolder(path, filter)
     return list
 end
 
-print(#fs.infolder("ssg/pipeline"))
-
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
