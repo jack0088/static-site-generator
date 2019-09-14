@@ -4,4 +4,7 @@ else
     package.path = "./?/init.lua;"..package.path
 end
 
-print("ssg is watching you...")
+
+function love.load()
+    print("ssg is watching you...")
+end

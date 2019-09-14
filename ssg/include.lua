@@ -1,7 +1,7 @@
 -- This module is responsible for searching for any resource and loading it
 -- 2019 (c) kontakt@herrsch.de
 
-local mime = require "ssg.mime"
+local mime = require "ssg.mimetype"
 local b64 = require "ssg.base64"
 local md = require "ssg.markdown"
 
