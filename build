@@ -1,0 +1,6 @@
+#!/bin/bash
+cd ssg
+zip -9 -r package.love .
+mv package.love ../run.love
+cd ..
+love run.love
