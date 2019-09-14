@@ -130,7 +130,7 @@ end
 
 
 function json.encode(val)
-  return ( encode(val) )
+  return encode(val)
 end
 
 

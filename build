@@ -5,5 +5,6 @@ mv package.love ../run.love
 cd ..
 love run.love
 
-# TODO add love2d installation check before running
-# TODO? add auto-install commands depending on the platform running on
+# TODO add love2d installation check before running anything
+# TODO? add love2d auto-download command depending on the platform running on?
+# TODO before building the love source - check if the development folder "ssg" exists, otherwise just run the compiled love file

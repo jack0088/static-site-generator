@@ -3,7 +3,7 @@
 -- This library is primarily used to access the filesystem and OS statistics by its own internal tools
 -- 2019 (c) kontakt@herrsch.de
 
-local sh = require "ssg.shell" -- every os.execute command becomes accessible as global function call
+local sh = require "shell" -- every os.execute command becomes accessible as global function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
 

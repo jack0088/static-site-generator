@@ -1,9 +1,9 @@
 -- This module is responsible for searching for any resource and loading it
 -- 2019 (c) kontakt@herrsch.de
 
-local mime = require "ssg.mimetype"
-local b64 = require "ssg.base64"
-local md = require "ssg.markdown"
+local mime = require "mimetype"
+local b64 = require "base64"
+local md = require "markdown"
 
 -- TODO you get a placeholder {{foobar.baz}}
 -- filter the placeholder to identify @path vs. an objects .property
@@ -25,10 +25,13 @@ function image64(path)
     }
 end
 
-print(mime.guess("content/test.jpg"))
--- print("<img src=\""..image64("content/test4.jpg").src.."\">")
+print(mime.guess("herrsch/content/test.jpg"))
+-- print("<img src=\""..image64("herrsch/content/test4.jpg").src.."\">")
 
 
+-- TODO unite both funcs as we can read binary
+-- and then either use as text or convert to b64 or whatever
+--"rb" read mode is ok for any usage as it seems
 
 
 function markdownhtml(path)
@@ -39,4 +42,4 @@ function markdownhtml(path)
 end
 
 
--- print(markdownhtml("content/description.md"))
+-- print(markdownhtml("herrsch/content/description.md"))
