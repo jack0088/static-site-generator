@@ -4,3 +4,6 @@ zip -9 -r package.love .
 mv package.love ../run.love
 cd ..
 love run.love
+
+# TODO add love2d installation check before running
+# TODO? add auto-install commands depending on the platform running on
