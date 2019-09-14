@@ -124,6 +124,21 @@ function fs.deletefolder(path)
 end
 
 
+-- @path (string) relative- or absolute path to the file or (sub-)folder you want to copy
+-- @location (string) is the new place to paste the copy at, NOTE that this string can also contain a new name for the copied resource!
+-- includes nested files and folders
+-- returns (boolean) true on success
+function fs.copy(path, location)
+    return sh.cp("-a", "'"..path.."'", "'"..location.."'").__exitcode == 0
+end
+
+
+function fs.move(path, location)
+    if not fs.exists(path) then return false end
+    return sh.mv("'"..path.."'", "'"..location.."'").__exitcode == 0
+end
+
+
 -- @path (string) relative- or absolute path to folder or file
 -- @rights (string or number) permission level, see http://permissions-calculator.org
 -- fs.permissions(path) returns (string) an encoded 4 octal digit representing the permission level
