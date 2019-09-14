@@ -6,5 +6,5 @@ end
 
 
 function love.load()
-    print("ssg is watching you...")
+    print("static-site-generator is watching you...")
 end
