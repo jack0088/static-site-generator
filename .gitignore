@@ -1,4 +1,6 @@
+com.example
 *.love
+
 *.icloud
 .DS_Store
 .DS_Store?
