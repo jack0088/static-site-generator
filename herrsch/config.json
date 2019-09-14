@@ -1,5 +1,5 @@
 {
-    "render": "herrsch/sitemap",
+    "render": "sitemap",
     "publish": "www",
     "plugin": []
 }
