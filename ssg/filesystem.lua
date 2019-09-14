@@ -145,7 +145,7 @@ end
 -- fs.permissions(path, right) recursevly sets permission level and returns (boolean) true for successful assignment
 function fs.permissions(path, right)
     local fmt = "%03d"
-    if type(path) ~= "string" or (not fs.isfile(path) and not fs.isfolder(path)) then return nil end
+    if type(path) ~= "string" or not fs.exists(path) then return nil end
     if type(right) == "number" then
         -- NOTE seems you can not go below chmod 411 on MacOS
         -- as the operating system resets it automatically to the next higher permission level
