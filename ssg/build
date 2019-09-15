@@ -2,6 +2,9 @@
 if [ ! -z `ls ./build` ]
 then
     zip -9 -r source.love . -x build \*.app\* \*.love\* "*.DS_Store"
-    mv source.love run.app/Contents/Resources/main.love
+    mv source.love run.app/Contents/Resources/main.love #default naming convention as the wrapper is not signed or customized in any way
     open run.app
+else
+    echo "The directory you are currently in does NOT contain the build file that you try to run."
+    echo "Please change into the directory that contains the build file and retry your action."
 fi
