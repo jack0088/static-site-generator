@@ -74,6 +74,12 @@ function fs.infolder(path, filter)
 end
 
 
+-- returns (string) of the current location you are at
+function fs.currentfolder()
+    return fs.trim(tostring(fs.echo("$(pwd)")))
+end
+
+
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
@@ -163,6 +169,9 @@ function fs.permissions(path, right)
     end
     return nil -- answer for unknown OS
 end
+
+
+-- TODO add func to copy&paste from/to clipboard
 
 
 return fs
