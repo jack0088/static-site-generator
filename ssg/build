@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ ! -z `ls ./build` ]
+then
+    zip -9 -r source.love . -x build \*.app\* \*.love\* "*.DS_Store"
+    mv source.love run.app/Contents/Resources/main.love
+    open run.app
+fi

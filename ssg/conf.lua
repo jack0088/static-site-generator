@@ -1,5 +1,5 @@
 function love.conf(t)
-    t.modules.graphics = false
+    t.modules.graphics = true
     t.modules.image = true
     t.modules.font = false
     t.modules.sound = false
@@ -16,5 +16,5 @@ function love.conf(t)
     t.modules.thread = true
     t.modules.event = true
     t.modules.timer = true
-    t.modules.window = false -- headless
+    t.modules.window = true -- false for headless build
 end
