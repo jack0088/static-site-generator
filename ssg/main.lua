@@ -17,3 +17,8 @@ end
 function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
 end
+
+-- TODO evaluate these for loading website projects
+--love.directorydropped
+--love.filedropped
+--love.filesystem.mount
