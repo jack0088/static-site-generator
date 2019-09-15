@@ -1,8 +1,11 @@
 -- Run Shell scripts to access systems in-build low-level functionality
 -- that otherwise would be accessible through external dependencies exclusevly;
+-- note that frameworks like love2d are also sandboxed due to security reasons and with this lib you can work around this limitation
 -- This library is primarily used to access the filesystem and OS statistics by its own internal tools
 -- 2019 (c) kontakt@herrsch.de
 
+local mime = require "mimetype"
+local b64 = require "base64"
 local sh = require "shell" -- every os.execute command becomes accessible as global function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
@@ -130,6 +133,26 @@ function fs.deletefolder(path)
 end
 
 
+-- @path (string) relative- or absolute path to the file
+-- returns (table) that contains information about the file, e.g. path, directory, filename, file extension, raw content, etc
+function fs.readfile(path)
+    if not fs.isfile(path) then return nil end
+    local obj = {}
+    local f = io.open(path, "rb")
+    obj.url = path
+    obj.mime, obj.directory, obj.name, obj.extension = mime.guess(obj.url)
+    obj.raw = f:read("*a")
+    obj.src = "data:"..obj.mime..";base64,"..b64.encode(obj.raw)
+    io.close(f)
+    return obj
+end
+
+
+function fs.writefile(path, data)
+    --TODO!
+end
+
+
 -- @path (string) relative- or absolute path to the file or (sub-)folder you want to copy
 -- @location (string) is the new place to paste the copy at, NOTE that this string can also contain a new name for the copied resource!
 -- includes nested files and folders
@@ -142,6 +165,17 @@ end
 function fs.move(path, location)
     if not fs.exists(path) then return false end
     return sh.mv("'"..path.."'", "'"..location.."'").__exitcode == 0
+end
+
+
+function fs.copyclipboard()
+    --TODO!
+    -- TODO we might need not only strings but also files to be copied and pasted?
+end
+
+
+function fs.pasteclipboard()
+    --TODO!
 end
 
 
@@ -169,9 +203,6 @@ function fs.permissions(path, right)
     end
     return nil -- answer for unknown OS
 end
-
-
--- TODO add func to copy&paste from/to clipboard
 
 
 return fs
