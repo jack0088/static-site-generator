@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ ! -z `ls ./build` ]
 then
-    zip -9 -r source.love . -x build \*.app\* \*.love\* "*.DS_Store"
+    zip -9 -r -j source.love ssg/* -x build \*.git\* \*.app\* \*.love\* "*.DS_Store"
     mv source.love run.app/Contents/Resources/main.love #default naming convention as the wrapper is not signed or customized in any way
     open run.app
 else
