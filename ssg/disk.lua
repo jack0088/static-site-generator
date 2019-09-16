@@ -40,7 +40,7 @@ end
 
 -- @path (string) relative- or absolute path to a file or folder
 -- returns (string) mime-type of the resource
-function fs.mime(path)
+function fs.mimetype(path)
     -- NOTE for more predictable web-compilant results use the mime.lua module!
     return fs.trim(tostring(sh.file("--mime-type", "-b", "'"..path.."'")))
 end
@@ -139,17 +139,26 @@ function fs.readfile(path)
     if not fs.isfile(path) then return nil end
     local obj = {}
     local f = io.open(path, "rb")
+    if not f then return nil end
     obj.url = path
-    obj.mime, obj.directory, obj.name, obj.extension = mime.guess(obj.url)
-    obj.raw = f:read("*a")
-    obj.src = "data:"..obj.mime..";base64,"..b64.encode(obj.raw)
-    io.close(f)
+    obj.media_type = fs.mimetype(path)
+    obj.content_type, obj.directory, obj.name, obj.extension = mime.guess(obj.url)
+    obj.raw_content = f:read("*a")
+    obj.base64_source = "data:"..obj.mime..";base64,"..b64.encode(obj.raw)
+    f:close()
     return obj
 end
 
 
 function fs.writefile(path, data)
-    --TODO!
+    -- TODO? check permissions before write?
+    if fs.isfolder(path) then return false end
+    if not fs.exists(path) then fs.makefile(path) end
+    local f = io.open(path, "wb")
+    if not f then return false end
+    f:write(data)
+    f:close()
+    return true
 end
 
 
