@@ -5,7 +5,10 @@ else
 end
 
 
+local pretty = require "prettify"
+local mime = require "mimetype"
 local json = require "json"
+local fs = require "disk"
 
 
 function love.load()
@@ -18,7 +21,12 @@ function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
 end
 
--- TODO evaluate these for loading website projects
---love.directorydropped
---love.filedropped
---love.filesystem.mount
+
+-- TODO evaluate fallowing options for loading projects
+
+--love.system.openURL("file://") -- for running the project?
+
+function love.directorydropped(path)
+    print("dropped folder:", path)
+    --fs.writefile(path.."/config.json", "huhu, hello world!")
+end
