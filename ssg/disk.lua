@@ -145,6 +145,7 @@ function fs.readfile(path)
     obj.content_type, obj.directory, obj.name, obj.extension = mime.guess(obj.url)
     obj.raw_content = f:read("*a")
     obj.base64_source = "data:"..obj.mime..";base64,"..b64.encode(obj.raw)
+    -- TODO? make File its own class with getters for .base64 and .mime
     f:close()
     return obj
 end
@@ -177,14 +178,26 @@ function fs.move(path, location)
 end
 
 
-function fs.copyclipboard()
-    --TODO!
-    -- TODO we might need not only strings but also files to be copied and pasted?
+function fs.readclipboard()
+    if fs.os("darwin") then -- MacOS
+        -- TODO if we pass around other types like files
+        -- can we have custom string formats that we encode/parse or do we need to support other formats than strings as well?
+        return fs.trim(tostring(sh.pbpaste())) --return fs.trim(tostring(sh.echo("`pbpaste`")))
+    elseif fs.os("linux") then -- Linux
+        -- TODO use xclip
+    end
+    return nil
 end
 
 
-function fs.pasteclipboard()
-    --TODO!
+-- @data (string)
+function fs.writeclipboard(data)
+    if fs.os("darwin") then -- MacOS
+        return sh.echo("'"..data.."'"):pbcopy().__exitcode == 0
+    elseif fs.os("linux") then -- Linux
+        -- TODO use xclip
+    end
+    return false
 end
 
 
