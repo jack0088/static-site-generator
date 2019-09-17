@@ -7,7 +7,7 @@ local function prettify(t, o)
         local s = "{"
         for k, v in pairs(t) do
             if type(k) ~= "number" then k = '"'..k..'"' end
-            s = s.."\n    "..o.."["..k.."] = "..prettify(v, o.."    ")..","
+            if v ~= t then s = s.."\n    "..o.."["..k.."] = "..prettify(v, o.."    ").."," end
         end
         return s:sub(1, -2).."\n"..o.."}"
     else
