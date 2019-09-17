@@ -1,5 +1,19 @@
--- This module is responsible for searching for any resource and loading it
+
 -- 2019 (c) kontakt@herrsch.de
+
+-- possible names of this module
+-- source
+-- origin
+-- asset
+-- pointer
+-- record
+-- heap
+-- file register
+-- fragment
+
+-- TODO write this into a file class that can handle getters and setters for modifieng its data
+
+
 
 local mime = require "mimetype"
 local b64 = require "base64"
