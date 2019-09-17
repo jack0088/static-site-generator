@@ -31,7 +31,11 @@ super.derivant = function(klass, subklass) return klass:parent() == subklass end
 -- @... (optional arguments): argements are passed to the optional class constructor
 local function replica(array, ...)
     local copy = array.__parent and replica(array.__parent) or {}
-    if array ~= super then for k, v in pairs(array) do copy[k] = v end end
+    if array ~= super then
+        for k, v in pairs(array) do
+            if k ~= "__parent" then copy[k] = v end
+        end
+    end
     return copy.new and (copy:new(...) or copy) or copy
 end
 
@@ -69,8 +73,15 @@ thing.lol = "newlolvalthroughsetter"
 
 local men = class(thing)
 men.human = true
-men.lol = "menlol"
-print(pretty(men.lol), thing.lol)
+men.get_lol = function(this) return this.__lol__value__, "nothing here" end
+-- men.lol = "menlol"
+local a, b = men.lol
+-- print(a, b)
+local bob = men()
+bob.bob = true
+men.human = false
+print(pretty(men))
+print(pretty(bob))
 
 
 return class
