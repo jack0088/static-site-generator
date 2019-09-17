@@ -164,7 +164,7 @@ end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder you want to copy
--- @location (string) is the new place to paste the copy at, NOTE that this string can also contain a new name for the copied resource!
+-- @location (string) is the new place of the copied resource, NOTE that this string can also contain a new name for the copied resource!
 -- includes nested files and folders
 -- returns (boolean) true on success
 function fs.copy(path, location)
@@ -172,12 +172,17 @@ function fs.copy(path, location)
 end
 
 
+-- @path (string) relative- or absolute path to the file or (sub-)folder you want to move to another location
+-- @location (string) is the new place of the moved rosource, NOTE that this string can also contain a new name for the copied resource!
+-- includes nested files and folders
+-- returns (boolean) true on success
 function fs.move(path, location)
     if not fs.exists(path) then return false end
     return sh.mv("'"..path.."'", "'"..location.."'").__exitcode == 0
 end
 
 
+-- returns (string) current content of the system clipboard
 function fs.readclipboard()
     if fs.os("darwin") then -- MacOS
         -- TODO if we pass around other types like files
@@ -190,7 +195,8 @@ function fs.readclipboard()
 end
 
 
--- @data (string)
+-- @data (string) the content to insert into the clipboard
+-- returns (boolean) true on success
 function fs.writeclipboard(data)
     if fs.os("darwin") then -- MacOS
         return sh.echo("'"..data.."'"):pbcopy().__exitcode == 0
