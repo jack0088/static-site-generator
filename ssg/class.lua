@@ -16,23 +16,50 @@ local super = {}
 super.__index = super
 
 -- Return the parent object of a given class object
--- @klass (required table): class object whose parent should be returned
-super.parent = function(klass) return klass.__parent end
+-- @object (required table): class object whose parent should be returned
+super.parent = function(object) return object.__parent end
 
 -- Check if an object is a parent of nother one
--- @klass (required table): reference object whose relation we want to check (the derivant)
--- @subklass (required table): relative object which might be the parent of our derivant (=@klass)
-super.derivant = function(klass, subklass) return klass:parent() == subklass end
+-- @child (required table): reference object whose relation we want to check (the derivant)
+-- @parent (required table): relative object which might be the parent of our derivant
+super.derivant = function(child, parent) return child:parent() == parent end
+
+-- Guide every access to any table key through this proxy to apply validation checks and inject custom behaviour
+-- @object (required table) is a class object whose property we want to (re-)assign or to read
+-- @key (required string) is the property we try to access
+-- @value (optional of any type) is the new value we want to assign to that @object[@key]
+-- returns (any type) the value that the getter, setter or the propery returned
+local function proxy(object, key, value)
+    if type(object) == "nil" or type(key) == "nil" then return nil end
+    local GET_OR_SET = key:lower():match("^[gs]et_(.+)")
+    if type(value) == "nil" then
+        if GET_OR_SET then return rawget(object, key) end -- access with getter/setter prefix
+        local getter = rawget(object, "get_"..key) -- try find getter on prefixless access
+        if type(getter) == "function" then return getter(object) end -- however ignore non-function getter
+        return rawget(object, key) or object.__parent[key]
+    end
+    if GET_OR_SET then -- with getter/setter prefix
+        assert(type(rawget(object, GET_OR_SET)) == "nil", "getter/setter assignment failed due to conflict with existing property")
+        assert(type(value) == "function", "getter/setter assignment must be a function value")
+        rawset(object, key, value)
+        return value
+    end
+    local setter = rawget(object, "set_"..key)
+    if type(setter) == "function" then return setter(object, value) or value end
+    assert(type(rawget(object, "get_"..key)) == "nil", "property assignment failed due to conflict with existing getter")
+    rawset(object, key, value)
+    return value
+end
 
 -- Make a shallow copy of a class while walking down the entire inheritance chain
 -- Call the constructor of the new class instance (if there is any) and return its return value
 -- or simply return the new class instance itself, if there the instance has no constructor method
--- @array (required table): class object to shallow-copy recursevly
+-- @object (required table): class object to shallow-copy recursevly
 -- @... (optional arguments): argements are passed to the optional class constructor
-local function replica(array, ...)
-    local copy = array.__parent and replica(array.__parent) or {}
-    if array ~= super then
-        for k, v in pairs(array) do
+local function replica(object, ...)
+    local copy = object.__parent and replica(object.__parent) or {}
+    if object ~= super then
+        for k, v in pairs(object) do
             if k ~= "__parent" then copy[k] = v end
         end
     end
@@ -40,48 +67,10 @@ local function replica(array, ...)
 end
 
 -- Create a new class object or create a sub-class from an already existing class
--- @something (optional table): parent class to sub-call from
+-- @parent (optional table): parent class to sub-call from
 local function class(parent)
-    local proxy = function(array, key, value)
-        if type(array) == "nil" or type(key) == "nil" then return nil end
-        if type(value) == "nil" then
-            if key:lower():match("^[gs]et_(.+)") then return rawget(array, key) end -- access with getter/setter prefix
-            local getter = rawget(array, "get_"..key) -- try find getter on prefixless access
-            if type(getter) == "function" then return getter(array) end -- however ignore non-function getter
-            return rawget(array, key) or array.__parent[key]
-        end
-        if key:lower():match("^[gs]et_(.+)") then -- with getter/setter prefix
-            assert(type(value) == "function", "getter/setter assignment must be a function value")
-            rawset(array, key, value)
-            return value
-        end
-        local setter = rawget(array, "set_"..key)
-        if type(setter) == "function" then return setter(array, value) or value end
-        rawset(array, key, value)
-        return value
-    end
     return setmetatable({__parent = parent or super}, {__index = proxy, __newindex = proxy, __call = replica})
 end
-
-
-local pretty = require "prettify"
-local thing = class()
-thing.foobar = "foobarval"
-function thing:get_lol() return self.__lol__value__ end
-function thing:set_lol(v) self.__lol__value__ = v return "fuuuck yeas!" end
-thing.lol = "newlolvalthroughsetter"
-
-local men = class(thing)
-men.human = true
-men.get_lol = function(this) return this.__lol__value__, "nothing here" end
--- men.lol = "menlol"
-local a, b = men.lol
--- print(a, b)
-local bob = men()
-bob.bob = true
-men.human = false
-print(pretty(men))
-print(pretty(bob))
 
 
 return class
