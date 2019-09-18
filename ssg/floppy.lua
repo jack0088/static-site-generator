@@ -6,7 +6,7 @@
 
 local mime = require "mimetype"
 local b64 = require "base64"
-local sh = require "shell" -- every os.execute command becomes accessible as global function call
+local sh = require "shell" -- every os.execute command becomes accessible as a function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
 
