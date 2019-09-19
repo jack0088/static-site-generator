@@ -9,9 +9,9 @@
 --]]
 
 
--- This is the super (base) class for all new class objects
--- which has important methods that all classes might want to use
--- This super class is NOT copied to instance objects once classes get instanciated!
+-- Base class for all new (parentless) class objects
+-- Only useful to provide important methods across all (sub-)classes
+-- Properties and methods of this object are NOT copied to instances of classes!
 local super = {}
 super.__index = super
 
