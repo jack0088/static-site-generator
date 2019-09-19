@@ -31,22 +31,22 @@ super.derivant = function(child, parent) return child:parent() == parent end
 -- returns (any type) the value that the getter, setter or the propery returned
 local function proxy(object, key, value)
     if type(object) == "nil" or type(key) == "nil" then return nil end
-    local GET_OR_SET = key:lower():match("^[gs]et_(.+)")
+    local get = rawget(object, "get_"..key)
+    local set = rawget(object, "set_"..key)
+    local getset = key:lower():match("^[gs]et_(.+)")
     if type(value) == "nil" then
-        if GET_OR_SET then return rawget(object, key) end -- access with getter/setter prefix
-        local getter = rawget(object, "get_"..key) -- try find getter on prefixless access
-        if type(getter) == "function" then return getter(object) end -- however ignore non-function getter
+        if getset then return rawget(object, key) end -- access with getter/setter prefix
+        if type(get) == "function" then return get(object) end -- try find getter on prefixless access, however ignore non-function getter
         return rawget(object, key) or object.__parent[key]
     end
-    if GET_OR_SET then -- with getter/setter prefix
-        assert(type(rawget(object, GET_OR_SET)) == "nil", "getter/setter assignment failed due to conflict with existing property")
+    if getset then -- with getter/setter prefix
+        assert(type(rawget(object, getset)) == "nil", "getter/setter assignment failed due to conflict with existing property")
         assert(type(value) == "function", "getter/setter assignment must be a function value")
         rawset(object, key, value)
         return value
     end
-    local setter = rawget(object, "set_"..key)
-    if type(setter) == "function" then return setter(object, value) or value end
-    assert(type(rawget(object, "get_"..key)) == "nil", "property assignment failed due to conflict with existing getter")
+    if type(set) == "function" then return set(object, value) or value end
+    assert(type(get) == "nil", "property assignment failed due to conflict with existing getter")
     rawset(object, key, value)
     return value
 end
@@ -66,11 +66,18 @@ local function replica(object, ...)
     return copy.new and (copy:new(...) or copy) or copy
 end
 
+-- This wrapper adds a proxy to a class instance to maintain gettter/setter support
+-- @... (required arguments) the list starts with the class to instanciate from,
+-- and is fallowed by optional number and type of arguments to that the instance constructor might need
+-- returns (table) an instance of a class
+local function cast(...)
+    return setmetatable(replica(...), {__index = proxy, __newindex = proxy}) -- support getter/setter
+end
+
 -- Create a new class object or create a sub-class from an already existing class
 -- @parent (optional table): parent class to sub-call from
 local function class(parent)
-    return setmetatable({__parent = parent or super}, {__index = proxy, __newindex = proxy, __call = replica})
+    return setmetatable({__parent = parent or super}, {__index = proxy, __newindex = proxy, __call = cast})
 end
-
 
 return class
