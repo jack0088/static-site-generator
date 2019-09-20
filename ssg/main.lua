@@ -1,19 +1,15 @@
 if _VERSION > "Lua 5.1" then
     unpack = unpack or table.unpack
 else
-    package.path = "./?/init.lua;"..package.path
+    package.path = "./?/init.lua;./?/main.lua;"..package.path
 end
 
 
 local pretty = require "prettify"
-local mime = require "mimetype"
-local json = require "json"
 local fs = require "floppy"
 
 
 function love.load()
-    print("static-site-generator is watching you...")
-    if json then print("JSON is included", type(json)) end
 end
 
 
