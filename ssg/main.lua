@@ -5,9 +5,9 @@ else
 end
 
 
-local pretty = require "prettify"
-local fs = require "floppy"
 
+local assembler = require "assemble"
+local sh = require "shell"
 
 function love.load()
 end
@@ -20,8 +20,9 @@ end
 --love.system.openURL("file://") -- for running the project?
 
 function love.directorydropped(path)
-    print("dropped folder:", path)
-    --fs.writefile(path.."/config.json", "huhu, hello world!")
+    -- try find config in user save directory
+    -- assembler.run(config_file)
+    assembler.render(path) -- debug
 end
 
 
