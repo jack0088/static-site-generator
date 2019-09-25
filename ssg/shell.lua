@@ -82,8 +82,7 @@ local function command(cmd, ...)
                 return Shell[k] --, ...
 			end,
 			__tostring = function(self)
-				-- return trimmed command output as a string
-				return self.__input:match("^%s*(.-)%s*$")
+				return self.__input:match("^%s*(.-)%s*$") -- trimmed command output as a string
 			end
 		}
 		return setmetatable(t, mt)
