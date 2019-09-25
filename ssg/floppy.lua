@@ -4,8 +4,7 @@
 -- This library is primarily used to access the filesystem and OS statistics by its own internal tools
 -- 2019 (c) kontakt@herrsch.de
 
-local mime = require "mimetype"
-local b64 = require "base64"
+
 local sh = require "shell" -- every os.execute command becomes accessible as a function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
 
@@ -18,6 +17,14 @@ function fs.trim(str)
     local mask = "[ \t\r\n]*"
     local result = str:gsub("^"..mask, ""):gsub(mask.."$", "")
     return result
+end
+
+
+function fs.quote(paraphrase)
+    --paraphrase:gsub("%s", [[\\ ]])
+    local new = string.format('"%s"', paraphrase)
+    print(new)
+    return new
 end
 
 
@@ -34,7 +41,7 @@ end
 -- @path (string) relative- or absolute path to a file or folder
 -- returns (boolean)
 function fs.exists(path)
-    return sh.test("-e", "'"..path.."'").__exitcode == 0
+    return sh.test("-e", fs.quote(path)).__exitcode == 0
 end
 
 
@@ -42,21 +49,22 @@ end
 -- returns (string) mime-type of the resource
 function fs.mimetype(path)
     -- NOTE for more predictable web-compilant results use the mime.lua module!
-    return fs.trim(tostring(sh.file("--mime-type", "-b", "'"..path.."'")))
+    return fs.trim(tostring(sh.file("--mime-type", "-b", fs.quote(path))))
 end
 
 
 -- @path (string) relative- or absolute path to a file
 -- returns (boolean)
 function fs.isfile(path)
-    return sh.test("-f", "'"..path.."'").__exitcode == 0
+    return fs.exists(path) and sh.test("-f", fs.quote(path)).__exitcode == 0
 end
 
 
 -- @path (string) relative- or absolute path to a folder
 -- returns (boolean)
 function fs.isfolder(path)
-    return sh.test("-d", "'"..path.."'").__exitcode == 0
+    print(sh.test("-d", fs.quote(path)).__exitcode)
+    return fs.exists(path) and sh.test("-d", fs.quote(path)).__exitcode == 0
 end
 
 
@@ -67,7 +75,7 @@ end
 -- otherwise an array of files inside that folder
 function fs.infolder(path, filter)
     if not fs.isfolder(path) then return nil end
-    local content = fs.trim(tostring(sh.ls("'"..path.."'"):grep("'"..(filter or "").."'")))
+    local content = fs.trim(tostring(sh.ls(fs.quote(path)):grep(fs.quote(filter or ""))))
     local list = {}
     for resource in content:gmatch("[^\r\n]*") do
         table.insert(list, resource)
@@ -79,21 +87,21 @@ end
 
 -- returns (string) of the current location you are at
 function fs.currentfolder()
-    return fs.trim(tostring(fs.echo("$(pwd)")))
+    return fs.trim(tostring(sh.echo("$(pwd)")))
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.createdat(path)
-    return fs.trim(tostring(sh.stat("-f", "%B", "'"..path.."'"))) -- TODO need to verify on other platforms than MacOS
+    return fs.trim(tostring(sh.stat("-f", "%B", fs.quote(path)))) -- TODO need to verify on other platforms than MacOS
 end
 
 
 -- @path (string) relative- or absolute path to the file or (sub-)folder
 -- returns (string) epoch/ unix date timestamp
 function fs.modifiedat(path)
-    return fs.trim(tostring(sh.date("-r", "'"..path.."'", "+%s"))) -- TODO need to verify on other platforms than MacOS
+    return fs.trim(tostring(sh.date("-r", fs.quote(path), "+%s"))) -- TODO need to verify on other platforms than MacOS
 end
 
 
@@ -102,7 +110,7 @@ end
 -- returns (boolean) true on success
 function fs.makefile(path)
     if fs.isfolder(path) then return false end
-    return sh.touch("'"..path.."'").__exitcode == 0
+    return sh.touch(fs.quote(path)).__exitcode == 0
 end
 
 
@@ -112,7 +120,7 @@ end
 -- returns (boolean) true on success
 function fs.makefolder(path)
     if fs.isfile(path) then return false end
-    return sh.mkdir("-p", "'"..path.."'").__exitcode == 0
+    return sh.mkdir("-p", fs.quote(path)).__exitcode == 0
 end
 
 
@@ -120,7 +128,7 @@ end
 -- skips non-existing file as well
 -- returns (boolean) true on success
 function fs.deletefile(path)
-    return sh.rm("-f", "'"..path.."'").__exitcode == 0
+    return sh.rm("-f", fs.quote(path)).__exitcode == 0
 end
 
 
@@ -129,13 +137,15 @@ end
 -- skips non-existing folder
 -- returns (boolean) true on success
 function fs.deletefolder(path)
-    return sh.rm("-rf", "'"..path.."'").__exitcode == 0
+    return sh.rm("-rf", fs.quote(path)).__exitcode == 0
 end
 
 
 -- @path (string) relative- or absolute path to the file
 -- returns (table) that contains information about the file, e.g. path, directory, filename, file extension, raw content, etc
 function fs.readfile(path)
+    local mime = require "mimetype" -- TODO remove these
+    local b64 = require "base64"
     if not fs.isfile(path) then return nil end
     local obj = {}
     local f = io.open(path, "rb")
@@ -168,7 +178,7 @@ end
 -- includes nested files and folders
 -- returns (boolean) true on success
 function fs.copy(path, location)
-    return sh.cp("-a", "'"..path.."'", "'"..location.."'").__exitcode == 0
+    return sh.cp("-a", fs.quote(path), fs.quote(location)).__exitcode == 0
 end
 
 
@@ -178,7 +188,7 @@ end
 -- returns (boolean) true on success
 function fs.move(path, location)
     if not fs.exists(path) then return false end
-    return sh.mv("'"..path.."'", "'"..location.."'").__exitcode == 0
+    return sh.mv(fs.quote(path), fs.quote(location)).__exitcode == 0
 end
 
 
@@ -199,7 +209,7 @@ end
 -- returns (boolean) true on success
 function fs.writeclipboard(data)
     if fs.os("darwin") then -- MacOS
-        return sh.echo("'"..data.."'"):pbcopy().__exitcode == 0
+        return sh.echo(fs.quote(data)):pbcopy().__exitcode == 0
     elseif fs.os("linux") then -- Linux
         -- TODO use xclip
     end
@@ -220,12 +230,12 @@ function fs.permissions(path, right)
         -- because the User (who created the file) at least holds a read access
         -- thus trying to set rights to e.g. 044 would result in 644
         -- which means User group automatically gets full rights (7 bits instead of 0)
-        return sh.chmod("-R", string.format(fmt, right), "'"..path.."'").__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
+        return sh.chmod("-R", string.format(fmt, right), fs.quote(path)).__exitcode == 0 --and tonumber(fs.permissions(path)) == tonumber(right)
     end
     if fs.os("darwin") then -- MacOS
-        return string.format(fmt, fs.trim(tostring(sh.stat("-r '"..path.."'"):awk("'{print $3}'"):tail("-c 4"))))
+        return string.format(fmt, fs.trim(tostring(sh.stat("-r", fs.quote(path)):awk("'{print $3}'"):tail("-c 4"))))
     elseif fs.os("linux") then -- Linux
-        return sh.stat("-c", "'%a'", "'"..path.."'") -- TODO needs testing
+        return sh.stat("-c", "'%a'", fs.quote(path)) -- TODO needs testing
     elseif fs.os("windows") then -- Windows
         -- TODO?
     end
