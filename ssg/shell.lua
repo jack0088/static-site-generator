@@ -91,10 +91,10 @@ end
 
 
 Shell.command = command
-Shell.tmpfile = './shlua' --'/tmp/shluainput'
+Shell.tmpfile = "/tmp/shluainp"
 
 
--- Shell(cmd, ...) and Shell.cmd(...) are equal calls
+-- Shell(cmd, ...) and Shell.cmd(...) and Shell.command(cmd, ...) are all equal calls
 return setmetatable(Shell, {
     __index = function(_, cmd, ...) return command(cmd, ...) end;
 	__call = function(_, cmd, ...) return command(cmd, ...) end
