@@ -6,8 +6,11 @@ end
 
 
 
-local assembler = require "assemble"
 local sh = require "shell"
+local love = {}
+
+print(sh("ls", ".", "/Users/herrsch/Downloads/test"))
+
 
 function love.load()
 end
