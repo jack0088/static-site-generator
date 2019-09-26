@@ -5,8 +5,9 @@
 -- 2019 (c) kontakt@herrsch.de
 
 
-local sh = require "shell" -- every os.execute command becomes accessible as a function call
 local fs = {} -- namespace for unix low-level plumbing method wrappers
+local sh = require "shell" -- every os.execute command becomes accessible as a function call
+--sh.tmpfile = string.gsub(love.filesystem.getSaveDirectory().."/prompt", "%s", "\\ ")
 
 
 -- @str (string): the string to trim
@@ -21,16 +22,21 @@ end
 
 
 function fs.quote(paraphrase)
-    --paraphrase:gsub("%s", [[\\ ]])
-    local new = string.format('"%s"', paraphrase)
-    print(new)
-    return new
+    return "\""..(paraphrase or "").."\""
+    --return string.format([["%s"]], paraphrase)
+    --return string.format([["%s"]], paraphrase:gsub("%s", "\\ "))
+end
+
+
+function fs.exitcode()
+    return fs.trim(tostring(sh.test("${PIPESTATUS[0]}", "-eq", "0")))
 end
 
 
 -- @platform (string) operating system to check against; returns (boolean) true on match
 -- platform regex could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
 -- returns (string) operating system identifier
+-- NOTE love.system.getOS() is another way of retreving it if this library is used in this context
 function fs.os(platform)
     local plat = fs.trim(tostring(sh.uname("-s")))
     if type(platform) == "string" then return type(plat:lower():match("^"..platform:lower())) ~= "nil" end
@@ -63,7 +69,6 @@ end
 -- @path (string) relative- or absolute path to a folder
 -- returns (boolean)
 function fs.isfolder(path)
-    print(sh.test("-d", fs.quote(path)).__exitcode)
     return fs.exists(path) and sh.test("-d", fs.quote(path)).__exitcode == 0
 end
 
