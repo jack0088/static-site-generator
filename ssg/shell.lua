@@ -1,100 +1,68 @@
--- Run Shell scripts with Lua syntax
--- found on https://github.com/zserge/luash
--- modified 2019 by kontakt@herrsch.de
-
-local Shell = {}
-
-
--- converts key and it's argument to "-k" or "-k=v" or just ""
-local function arg(k, a)
-	if not a then return k end
-	if type(a) == "string" and #a > 0 then return k.."=\""..a.."\"" end
-	if type(a) == "number" then return k.."="..tostring(a) end
-	if type(a) == "boolean" and a == true then return k end
-	error("invalid argument type", type(a), a)
+-- @str (string) the string to trim
+-- returns (string) with removed whitespaces, tabs and line-break characters from beginning- and ending of the string
+local function trim(str)
+    if type(str) ~= "string" then str = tostring(str or "") end
+    local mask = "[ \t\r\n]*"
+    return str:gsub("^"..mask, ""):gsub(mask.."$", "")
 end
 
 
--- converts nested tables into a flat list of arguments and concatenated input
-local function flatten(t)
-	local result = {args = {}, input = ""}
-	local function f(t)
-		local keys = {}
-		for k = 1, #t do
-			keys[k] = true
-			local v = t[k]
-			if type(v) == "table" then
-				f(v)
-			else
-				table.insert(result.args, v)
-			end
-		end
-		for k, v in pairs(t) do
-			if k == "__input" then
-				result.input = result.input..v
-			elseif not keys[k] and k:sub(1, 1) ~= "_" then
-				local key = "-"..k
-				if #k > 1 then key = "-"..key end
-				table.insert(result.args, arg(key, v))
-			end
-		end
-	end
-	f(t)
-	return result
+-- @val (any) the value to wrap in qoutes
+-- returns (string) value converted to string and wrapped into quotation marks
+local function quote(val)
+    return "\""..tostring(val or "").."\""
 end
 
 
--- returns a function that executes the command with given args and returns its
--- output, exit status etc
-local function command(cmd, ...)
-	local prearg = {...}
-	return function(...)
-		local args = flatten({...})
-		local s = cmd
-		for _, v in ipairs(prearg) do
-			s = s.." ".. v
-		end
-		for k, v in pairs(args.args) do
-			s = s.." "..v
-		end
-		if args.input then
-			s = s.." <"..Shell.tmpfile
-			local f = io.open(Shell.tmpfile, "w")
-			if f then
-				f:write(args.input)
-				f:close()
-			end
-		end
-		local p = io.popen(s, "r")
-		local _, exit, status, output
-		if p then
-			output = p:read("*a")
-			_, exit, status = p:close()
-			os.remove(Shell.tmpfile)
-		end
-		local t = {
-			__input = output,
-			__exitcode = exit == "exit" and status or 127,
-			__signal = exit == "signal" and status or 0,
-		}
-		local mt = {
-			__index = function(self, k, ...)
-                return Shell[k] --, ...
-			end,
-			__tostring = function(self)
-				return self.__input:match("^%s*(.-)%s*$") -- trimmed command output as a string
-			end
-		}
-		return setmetatable(t, mt)
-	end
+-- @fragments (table) list of values
+-- returns (string) concatenated string of all items similar to table.concat
+local function toquery(fragments)
+    local query = ""
+    for _, frag in ipairs(fragments) do
+        local f = tostring(frag)
+        if f:match("%s+") then f = quote(f) end
+        if not query:match("=$") then f = " "..f end
+        query = query..f
+    end
+    return trim(query)
 end
 
 
-Shell.command = command
-Shell.tmpfile = "/tmp/luashell" -- default (should be adjusted for sandboxed applications)
+-- @... (any) first argument should be the utility name fallowed by its list of parameters
+-- returns (string or nil, boolean) return value of utility call or nil, and its status
+local function cmd(...)
+    local tmpfile = "/tmp/shlua"
+    local exitcode = "; echo $? >>"..tmpfile
+    local command = os.execute(toquery{...}.." >>"..tmpfile..exitcode)
+    local console = io.open(tmpfile, "r")
+    local report, status = console:read("*a"):match("(.*)(%d+)[\r\n]*$") -- response, exitcode
+    report = trim(report)
+    status = tonumber(status) == 0
+    console:close()
+    os.remove(tmpfile)
+    return report ~= "" and report or nil, status
+end
 
--- Shell(cmd, ...) and Shell.cmd(...) and Shell.command(cmd, ...) are all equal calls
-return setmetatable(Shell, {
-    __index = function(_, cmd, ...) return command(cmd, ...) end;
-	__call = function(_, cmd, ...) return command(cmd, ...) end
-})
+
+-- add api like shell[utility](arguments) or shell.utility(arguments)
+local shell = setmetatable({}, {__index = function(_, utility, ...)
+    return cmd(utility, ...)
+end})
+
+
+local filesystem = {}
+
+
+-- @platform (string) operating system to check against; returns (boolean) true on match
+-- platform regex could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
+-- returns (string) operating system identifier
+-- NOTE love.system.getOS() is another way of retreving it if this library is used in this context
+function filesystem.os(platform)
+    local plat = shell.uname("-s")
+    if type(platform) == "string" then return type(plat:lower():match("^"..platform:lower())) ~= "nil" end
+    return plat
+end
+
+
+-- print(filesystem.os())
+print(shell.test())
