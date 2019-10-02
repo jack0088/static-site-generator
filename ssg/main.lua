@@ -6,13 +6,12 @@ end
 
 
 
-local sh = require "shell"
-local love = {}
-
-print(sh("ls", ".", "/Users/herrsch/Downloads/test"))
+local fs = require "shell"
 
 
 function love.load()
+    local p = "/Users/aschaefer/Library/Mobile Documents/com~apple~CloudDocs/whoami/dev/2019/static-site-generator/ssg/foobarrrrrr.txt"
+    print(fs.modifiedat(p))
 end
 
 
