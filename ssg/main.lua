@@ -9,6 +9,9 @@
 local gui = require "gui"
 local compile = require "compiler"
 
+local uiempty = love.graphics.newImage("dropfile.jpg")
+
+-- TODO introduce a simplified scene manager to work with different ui's
 
 function love.load()
 end
@@ -16,6 +19,7 @@ end
 
 function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
+    love.graphics.draw(uiempty)
 end
 
 --filesystem.openfolder() -- to open finder and show project folder?
