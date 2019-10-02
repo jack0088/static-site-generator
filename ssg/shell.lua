@@ -54,7 +54,7 @@ end})
 
 
 -- namespace plumbing tools to access filesystem at low-level
-local filesystem = {}
+local filesystem = {shell = shell}
 
 
 -- @platform (string) operating system to check against; returns (boolean) true on match
