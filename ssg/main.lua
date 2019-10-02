@@ -1,17 +1,16 @@
-if _VERSION > "Lua 5.1" then
-    unpack = unpack or table.unpack
-else
-    package.path = "./?/init.lua;./?/main.lua;"..package.path
-end
+-- if _VERSION > "Lua 5.1" then
+--     unpack = unpack or table.unpack
+-- else
+--     package.path = "./?/init.lua;./?/main.lua;"..package.path
+-- end
 
 
 
-local fs = require "plumber"
+local gui = require "gui"
+local compile = require "compiler"
 
 
 function love.load()
-    local p = "/Users/aschaefer/Library/Mobile Documents/com~apple~CloudDocs/whoami/dev/2019/static-site-generator/ssg/foobarrrrrr.txt"
-    print(fs.shell.cmd("echo", "hallo welt"))
 end
 
 
@@ -19,15 +18,16 @@ function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
 end
 
---love.system.openURL("file://") -- for running the project?
+--filesystem.openfolder() -- to open finder and show project folder?
+--love.system.openURL("file://") -- to run the project in browser?
 
 function love.directorydropped(path)
-    -- try find config in user save directory
-    -- assembler.run(config_file)
-    assembler.render(path) -- debug
+    -- try find config in user save directory | compiler.run(config)
+    compile(path)
 end
 
 
 function love.filedropped(data)
-    print(data)
+    print("dopping files is not supported right now, maybe later")
+    print("dropped file:", data)
 end
