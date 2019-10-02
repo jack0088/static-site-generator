@@ -22,12 +22,12 @@ function love.conf(t)
     t.window.icon = nil
     t.window.x = nil
     t.window.y = nil
-    t.window.width = 400
-    t.window.height = 200
-    t.window.minwidth = 400
-    t.window.minheight = 100
+    t.window.width = 512
+    t.window.height = 512
+    t.window.minwidth = 128
+    t.window.minheight = 128
     t.window.borderless = false
-    t.window.resizable = true
+    t.window.resizable = false
     t.window.fullscreen = false
     t.window.fullscreentype = "desktop"
     t.window.vsync = 1
