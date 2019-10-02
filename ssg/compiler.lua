@@ -1,24 +1,23 @@
 -- Trace placeholders inside files and repace them by other file contents
 -- 2019 (c) kontakt@herrsch.de
 
-local fs = require "floppy"
-local tracer = {}
+local fs = require "plumber"
 
 
-function tracer.render(folder)
-    print(type(folder), folder)
-    print(fs.exists(folder), fs.isfolder(folder), fs.isfile(folder))
-    -- if not fs.isfile(folder.."/index.html") then print("oh") return false end
-    -- print(folder)
+local function render(file, context)
 end
 
 
-function tracer.publish(folder)
+local function publish(folder)
 end
 
 
-function tracer.run(plugins)
+local function run(config)
+    --search for config or create a default one
+    --load plugins, if any
+    --call render (+ inject plugins)
+    --call publish (+ inject plugins)
 end
 
 
-return tracer
+return run
