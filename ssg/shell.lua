@@ -45,18 +45,21 @@ end
 
 
 -- add api like shell[utility](arguments) or shell.utility(arguments)
-local shell = setmetatable({}, {__index = function(_, utility, ...)
-    return cmd(utility, ...)
+local shell = setmetatable({}, {__index = function(_, utility)
+    return function(...)
+        return cmd(utility, ...)
+    end
 end})
 
 
+-- namespace plumbing tools to access filesystem at low-level
 local filesystem = {}
 
 
 -- @platform (string) operating system to check against; returns (boolean) true on match
 -- platform regex could be: linux*, windows* darwin*, cygwin*, mingw* (everything else might count as unknown)
 -- returns (string) operating system identifier
--- NOTE love.system.getOS() is another way of retreving it if this library is used in this context
+-- NOTE love.system.getOS() is another way of retreving this, if the love2d framework is used in this context
 function filesystem.os(platform)
     local plat = shell.uname("-s")
     if type(platform) == "string" then return type(plat:lower():match("^"..platform:lower())) ~= "nil" end
@@ -65,4 +68,4 @@ end
 
 
 -- print(filesystem.os())
-print(shell.test())
+print(filesystem.os("Windows"))
