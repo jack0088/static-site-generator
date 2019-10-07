@@ -256,6 +256,8 @@ end
 
 -- @path (string) relative- or absolute path to a file or folder
 -- returns directory path, filename, file extension and mime-type guessed by the file extension
+-- NOTE .filetype is the operating system mime-type of the resource (file or folder),
+-- while .mimetype is a web-compilant mime-type of the file judged by its file extension
 function filesystem.fileinfo(path)
     local meta = {}
     meta.url = path
