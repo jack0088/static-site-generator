@@ -261,7 +261,7 @@ end
 function filesystem.fileinfo(path)
     local meta = {}
     meta.url = path
-    meta.path, meta.name, meta.extension, meta.mimetype = mime.guess(meta.url)
+    meta.mimetype, meta.path, meta.name, meta.extension = mime.guess(meta.url)
     meta.filetype = filesystem.filetype(meta.url)
     meta.exists = filesystem.exists(meta.url)
     meta.isfile = filesystem.isfile(meta.url)
