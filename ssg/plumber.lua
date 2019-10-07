@@ -172,9 +172,9 @@ function filesystem.writefile(path, data)
     else
         file_pointer = path -- path is already a file handle
     end
-    if not f then return false end
-    f:write(data)
-    f:close()
+    if not file_pointer then return false end
+    file_pointer:write(data)
+    file_pointer:close()
     return true
 end
 
