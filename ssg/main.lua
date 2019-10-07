@@ -9,22 +9,43 @@ local compile = require "compiler"
 local CONFIG
 
 
+local function rgba(r, g, b, a)
+    return r/255, g/255, b/255, a/255
+end
+
+
 function love.load()
 end
 
 
 function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
+    
+    local w, h = love.graphics.getDimensions()
+    local lh = 18 -- line height
+
     if not CONFIG then
-        love.graphics.printf(
-            "missing project configuration\ndrag & drop your project folder here...",
-            0,
-            love.graphics.getHeight() * 0.425,
-            love.graphics.getWidth(),
-            "center"
-        )
+        love.graphics.printf("missing project configuration\ndrag & drop your project folder here...", 0, h * 0.425, w, "center")
     else
-        love.graphics.printf("project opened", 0, 0, 400)
+        love.graphics.translate(10, 10)
+
+        love.graphics.setColor(rgba(70, 118, 188, 255))
+        love.graphics.printf("Close Project", 0, 0, w, "center")
+
+        love.graphics.setColor(rgba(255, 255, 255, 255))
+        love.graphics.printf("Render folder", 0, 2*lh, w)
+        love.graphics.setColor(rgba(70, 118, 188, 255))
+        love.graphics.printf(CONFIG.settings.render, 0, 3*lh, w)
+
+        love.graphics.setColor(rgba(255, 255, 255, 255))
+        love.graphics.printf("Entry file (normally index.html)", 0, 5*lh, w)
+        love.graphics.setColor(rgba(70, 118, 188, 255))
+        love.graphics.printf(CONFIG.settings.entryfile, 0, 6*lh, w)
+
+        love.graphics.setColor(rgba(255, 255, 255, 255))
+        love.graphics.printf("Publish folder", 0, 8*lh, w)
+        love.graphics.setColor(rgba(70, 118, 188, 255))
+        love.graphics.printf(CONFIG.settings.publish, 0, 9*lh, w)
     end
 end
 
