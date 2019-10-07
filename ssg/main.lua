@@ -35,19 +35,6 @@ end
 
 function love.filedropped(data)
     local url
-    local default_config = {
-        render = "",
-        entryfile = "",
-        publish = "",
-        plugins = {}
-        ftp = {
-            server = "",
-            port = "21",
-            user = "",
-            password = ""
-        }
-    })
-    
     if type(data) == "string" then
         url = data
     else
@@ -55,14 +42,20 @@ function love.filedropped(data)
         data:close()
     end
 
-    if not fs.exists(url) then
-        fs.makefile(url)
-        fs.writefile(url, json.encode(default_config))
-    end
-
+    local project_config = json.decode(fs.readfile(url) or "{}")
     CONFIG = {}
+    CONFIG.settings = {
+        render = project_config.render or "",
+        entryfile = project_config.entryfile or "",
+        publish = project_config.publish or "",
+        plugins = project_config.plugins or {},
+        ftp_server = project_config.ftp_server or "",
+        ftp_port = project_config.ftp_port or 21,
+        ftp_user = project_config.ftp_user or "",
+        ftp_password = project_config.ftp_password or ""
+    }
+    fs.writefile(url, json.encode(CONFIG.settings)) -- update project config with defaults
     CONFIG.fileinfo = fs.fileinfo(url)
-    CONFIG.settings = json.decode(fs.readfile(url))
 
     compile(CONFIG.settings)
 end
