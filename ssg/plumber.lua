@@ -147,20 +147,30 @@ end
 -- @path (string) relative- or absolute path to the file
 -- returns (table) that contains information about the file, e.g. path, directory, filename, file extension, raw content, etc
 function filesystem.readfile(path)
-    if not filesystem.isfile(path) then return nil end
-    local f = io.open(path, "rb")
-    if not f then return nil end
-    local content = f:read("*a")
-    f:close()
+    local file_pointer
+    if type(path) == "string" then
+        if not filesystem.isfile(path) then return nil end
+        file_pointer = io.open(path, "rb")
+    else
+        file_pointer = path -- path is already a file handle
+    end
+    if not file_pointer then return nil end
+    local content = file_pointer:read("*a")
+    file_pointer:close()
     return content
 end
 
 
 function filesystem.writefile(path, data)
     -- TODO? check permissions before write?
-    if filesystem.isfolder(path) then return false end
-    if not filesystem.exists(path) then filesystem.makefile(path) end
-    local f = io.open(path, "wb")
+    local file_pointer
+    if type(path) == "string" then
+        if filesystem.isfolder(path) then return false end
+        if not filesystem.exists(path) then filesystem.makefile(path) end
+        file_pointer = io.open(path, "wb")
+    else
+        file_pointer = path -- path is already a file handle
+    end
     if not f then return false end
     f:write(data)
     f:close()
