@@ -9,7 +9,7 @@ local function prettify(t, o)
             if type(k) ~= "number" then k = '"'..k..'"' end
             if v ~= t then s = s.."\n    "..o.."["..k.."] = "..prettify(v, o.."    ").."," end
         end
-        return s:sub(1, -2).."\n"..o.."}"
+        return s.."\n"..o.."}" --s:sub(1, -2).."\n"..o.."}"
     else
         return type(t) == "string" and '"'..tostring(t)..'"' or tostring(t)
     end
