@@ -1,17 +1,13 @@
--- if _VERSION > "Lua 5.1" then
---     unpack = unpack or table.unpack
--- else
---     package.path = "./?/init.lua;./?/main.lua;"..package.path
--- end
+if _VERSION <= "Lua 5.1" then
+    package.path = "./?/init.lua;./?/main.lua;"..package.path
+end
 
 
-
-local gui = require "gui"
+local fs = require "plumber"
+local json = require "json"
 local compile = require "compiler"
+local gui = require "gui"
 
-local uiempty = love.graphics.newImage("dropfile.jpg")
-
--- TODO introduce a simplified scene manager to work with different ui's
 
 function love.load()
 end
@@ -19,19 +15,36 @@ end
 
 function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
-    love.graphics.draw(uiempty)
 end
+
 
 --filesystem.openfolder() -- to open finder and show project folder?
 --love.system.openURL("file://") -- to run the project in browser?
 
+
 function love.directorydropped(path)
-    -- try find config in user save directory | compiler.run(config)
-    compile(path)
+    local url = path.."/config.json"
+    if not fs.exists(url) then -- prepare project environment
+        fs.makefile(url)
+        fs.writefile(url, json.encode{
+            render = "",
+            entryfile = "index.html",
+            publish = "",
+            plugins = {}
+        })
+    end
+    love.filedropped(url) -- redirect request
 end
 
 
 function love.filedropped(data)
-    print("dopping files is not supported right now, maybe later")
-    print("dropped file:", data)
+    local url
+    if type(data) == "string" then
+        url = data
+    else
+        url = data:getFilename()
+        data:close()
+    end
+    local meta = fs.fileinfo(url)
+    compile(url)
 end

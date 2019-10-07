@@ -13,10 +13,10 @@ end
 
 
 local function run(config)
-    --search for config or create a default one
     --load plugins, if any
     --call render (+ inject plugins)
     --call publish (+ inject plugins)
+    print(config)
 end
 
 
