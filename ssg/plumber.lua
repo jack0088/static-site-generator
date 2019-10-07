@@ -54,6 +54,7 @@ end})
 
 
 -- namespace plumbing tools to access filesystem at low-level
+local mime = require "mimetype"
 local filesystem = {shell = shell}
 
 
@@ -76,9 +77,9 @@ end
 
 
 -- @path (string) relative- or absolute path to a file or folder
--- returns (string) mime-type of the resource
+-- returns (string) mime-type of the resource (file or folder)
 -- NOTE for more predictable web-compilant results use the mime.lua module!
-function filesystem.mimetype(path)
+function filesystem.filetype(path)
     if filesystem.exists(path) then return trim(shell.file("--mime-type", "-b", path)) end
     return nil
 end
@@ -250,6 +251,23 @@ function filesystem.permissions(path, right)
         -- TODO?
     end
     return nil -- unknown OS
+end
+
+
+-- @path (string) relative- or absolute path to a file or folder
+-- returns directory path, filename, file extension and mime-type guessed by the file extension
+function filesystem.fileinfo(path)
+    local meta = {}
+    meta.url = path
+    meta.path, meta.name, meta.extension, meta.mimetype = mime.guess(meta.url)
+    meta.filetype = filesystem.filetype(meta.url)
+    meta.exists = filesystem.exists(meta.url)
+    meta.isfile = filesystem.isfile(meta.url)
+    meta.isfolder = filesystem.isfolder(meta.url)
+    meta.created = filesystem.createdat(meta.url)
+    meta.modified = filesystem.modifiedat(meta.url)
+    meta.permissions = filesystem.permissions(meta.url)
+    return meta
 end
 
 
