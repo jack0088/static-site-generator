@@ -6,7 +6,6 @@ end
 local fs = require "plumber"
 local json = require "json"
 local compile = require "compiler"
-local gui = require "gui"
 local CONFIG
 
 
@@ -16,10 +15,16 @@ end
 
 function love.draw()
     love.graphics.setBackgroundColor(.2, .2, .3, 1)
-    if CONFIG then
-        love.graphics.printf("project opened", 0, 0, 400)
+    if not CONFIG then
+        love.graphics.printf(
+            "missing project configuration\ndrag & drop your project folder here...",
+            0,
+            love.graphics.getHeight() * 0.425,
+            love.graphics.getWidth(),
+            "center"
+        )
     else
-        love.graphics.printf("project config missing", 0, 0, 400)
+        love.graphics.printf("project opened", 0, 0, 400)
     end
 end
 
@@ -48,7 +53,7 @@ function love.filedropped(data)
         render = project_config.render or "",
         entryfile = project_config.entryfile or "",
         publish = project_config.publish or "",
-        plugins = project_config.plugins or {},
+        plugins = project_config.plugins or {}, -- TODO? implement plugins system?
         ftp_server = project_config.ftp_server or "",
         ftp_port = project_config.ftp_port or 21,
         ftp_user = project_config.ftp_user or "",
