@@ -2,6 +2,7 @@
 -- 2019 (c) kontakt@herrsch.de
 
 local fs = require "plumber"
+local pretty = require "prettify"
 
 
 local function render(file, context)
@@ -13,10 +14,11 @@ end
 
 
 local function run(config)
+    assert(type(config) == "table", "received a faulty project configuration file")
     --load plugins, if any
     --call render (+ inject plugins)
     --call publish (+ inject plugins)
-    print(config)
+    print(pretty(config))
 end
 
 
