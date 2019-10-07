@@ -29,23 +29,27 @@ function love.draw()
     else
         love.graphics.translate(10, 10)
 
+        love.graphics.setColor(rgba(255, 255, 255, 255))
+        love.graphics.printf("Project path", 0, 0, w)
+        love.graphics.printf(CONFIG.fileinfo.path, 0, lh, w-20, "left")
+
         love.graphics.setColor(rgba(70, 118, 188, 255))
-        love.graphics.printf("Close Project", 0, 0, w, "center")
+        love.graphics.printf("Close Project", 0, 5*lh, w, "center")
 
         love.graphics.setColor(rgba(255, 255, 255, 255))
-        love.graphics.printf("Render folder", 0, 2*lh, w)
+        love.graphics.printf("Render folder", 0, 7*lh, w)
         love.graphics.setColor(rgba(70, 118, 188, 255))
-        love.graphics.printf(CONFIG.settings.render, 0, 3*lh, w)
+        love.graphics.printf(CONFIG.settings.render, 0, 8*lh, w)
 
         love.graphics.setColor(rgba(255, 255, 255, 255))
-        love.graphics.printf("Entry file (normally index.html)", 0, 5*lh, w)
+        love.graphics.printf("Entry file (normally index.html)", 0, 10*lh, w)
         love.graphics.setColor(rgba(70, 118, 188, 255))
-        love.graphics.printf(CONFIG.settings.entryfile, 0, 6*lh, w)
+        love.graphics.printf(CONFIG.settings.entryfile, 0, 11*lh, w)
 
         love.graphics.setColor(rgba(255, 255, 255, 255))
-        love.graphics.printf("Publish folder", 0, 8*lh, w)
+        love.graphics.printf("Publish folder", 0, 13*lh, w)
         love.graphics.setColor(rgba(70, 118, 188, 255))
-        love.graphics.printf(CONFIG.settings.publish, 0, 9*lh, w)
+        love.graphics.printf(CONFIG.settings.publish, 0, 14*lh, w)
     end
 end
 
