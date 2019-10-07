@@ -1,7 +1,7 @@
 function love.conf(t)
     t.modules.graphics = true
     t.modules.image = true
-    t.modules.font = false
+    t.modules.font = true
     t.modules.sound = false
     t.modules.audio = false
     t.modules.video = false
